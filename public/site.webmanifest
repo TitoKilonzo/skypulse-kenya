@@ -1,0 +1,14 @@
+{
+  "name": "SkyPulse Kenya",
+  "short_name": "SkyPulse",
+  "description": "AI-powered weather dashboard for Kenya",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020d1a",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    { "src": "/favicon-16x16.png", "sizes": "16x16", "type": "image/png" },
+    { "src": "/favicon-32x32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

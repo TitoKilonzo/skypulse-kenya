@@ -1,0 +1,208 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Design Tokens ────────────────────────────────────────────────────────── */
+:root {
+  /* Sky-blue palette */
+  --sky-50:   #f0f9ff;
+  --sky-100:  #e0f2fe;
+  --sky-200:  #bae6fd;
+  --sky-300:  #7dd3fc;
+  --sky-400:  #38bdf8;
+  --sky-500:  #0ea5e9;
+  --sky-600:  #0284c7;
+  --sky-700:  #0369a1;
+  --sky-800:  #075985;
+  --sky-900:  #0c4a6e;
+
+  /* Surfaces */
+  --glass-bg:     rgba(6, 20, 40, 0.55);
+  --glass-border: rgba(56, 189, 248, 0.18);
+  --glass-hover:  rgba(56, 189, 248, 0.08);
+  --card-bg:      rgba(7, 25, 50, 0.65);
+
+  /* Text */
+  --text-primary:   #f0f9ff;
+  --text-secondary: rgba(186, 230, 253, 0.70);
+  --text-muted:     rgba(125, 211, 252, 0.40);
+
+  /* Accents */
+  --accent:    #38bdf8;
+  --accent-glow: rgba(56, 189, 248, 0.35);
+  --gold:      #fbbf24;
+  --success:   #34d399;
+  --danger:    #f87171;
+}
+
+/* ─── Reset & Base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: #020d1a;
+}
+
+/* ─── Background Hero Image ────────────────────────────────────────────────── */
+.bg-hero {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('https://images.unsplash.com/photo-1504608524841-42584120d693?w=1920&q=80&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  transition: background-image 0.8s ease;
+}
+
+.bg-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    165deg,
+    rgba(2, 13, 26, 0.72) 0%,
+    rgba(3, 32, 65, 0.60) 40%,
+    rgba(2, 13, 26, 0.85) 100%
+  );
+}
+
+/* Variant overlays per weather condition */
+.bg-hero.rain::after {
+  background: linear-gradient(165deg,rgba(2,10,20,0.82) 0%,rgba(5,25,50,0.75) 40%,rgba(2,10,20,0.92) 100%);
+}
+.bg-hero.storm::after {
+  background: linear-gradient(165deg,rgba(5,5,15,0.88) 0%,rgba(10,10,30,0.82) 40%,rgba(5,5,15,0.95) 100%);
+}
+.bg-hero.clear-night::after {
+  background: linear-gradient(165deg,rgba(0,5,20,0.78) 0%,rgba(2,10,40,0.65) 40%,rgba(0,5,20,0.88) 100%);
+}
+
+/* ─── Glass Morphism ───────────────────────────────────────────────────────── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(32px) saturate(1.8);
+  -webkit-backdrop-filter: blur(32px) saturate(1.8);
+  border: 1px solid rgba(56, 189, 248, 0.14);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(56,189,248,0.08);
+}
+
+.glass-pill {
+  background: rgba(56, 189, 248, 0.10);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 999px;
+}
+
+/* ─── Glow Effects ─────────────────────────────────────────────────────────── */
+.glow-sky {
+  box-shadow: 0 0 0 1px rgba(56,189,248,0.3), 0 0 24px rgba(56,189,248,0.15);
+}
+
+.text-glow {
+  text-shadow: 0 0 30px rgba(56,189,248,0.5);
+}
+
+/* ─── Accent line ──────────────────────────────────────────────────────────── */
+.accent-line {
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--sky-400), var(--sky-600));
+  border-radius: 4px;
+}
+
+/* ─── Typography ───────────────────────────────────────────────────────────── */
+.font-display { font-family: 'Playfair Display', serif; }
+.font-body    { font-family: 'Outfit', sans-serif; }
+.font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+/* ─── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.25); border-radius: 4px; }
+
+.scroll-x             { overflow-x: auto; scrollbar-width: none; }
+.scroll-x::-webkit-scrollbar { display: none; }
+
+/* ─── Animations ───────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%     { transform: translateY(-8px) rotate(2deg); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+@keyframes pulse-ring {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56,189,248,0.4); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 10px rgba(56,189,248,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56,189,248,0); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-fade-up   { animation: fadeUp  0.7s cubic-bezier(.16,1,.3,1) both; }
+.animate-fade-in   { animation: fadeIn  0.4s ease both; }
+.animate-float     { animation: float   6s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 16s linear infinite; }
+.animate-pulse-ring{ animation: pulse-ring 2s ease-out infinite; }
+
+.delay-100 { animation-delay: 0.10s; }
+.delay-150 { animation-delay: 0.15s; }
+.delay-200 { animation-delay: 0.20s; }
+.delay-300 { animation-delay: 0.30s; }
+.delay-400 { animation-delay: 0.40s; }
+.delay-500 { animation-delay: 0.50s; }
+.delay-600 { animation-delay: 0.60s; }
+.delay-700 { animation-delay: 0.70s; }
+
+/* ─── Skeleton Shimmer ─────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(56,189,248,0.04) 25%,
+    rgba(56,189,248,0.12) 50%,
+    rgba(56,189,248,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+  border-radius: 10px;
+}
+
+/* ─── Transitions ──────────────────────────────────────────────────────────── */
+button, a { transition: all 0.2s ease; }
+
+/* ─── Divider ──────────────────────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56,189,248,0.2), transparent);
+}
