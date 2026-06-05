@@ -22,7 +22,8 @@
     "tailwindcss": "^3.4.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.15",
-    "eslint": "^8",
+    "eslint": "^9",
+    "@eslint/eslintrc": "^3",
     "eslint-config-next": "15.5.19"
   },
   "overrides": {

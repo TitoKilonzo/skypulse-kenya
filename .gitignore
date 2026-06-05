@@ -24,14 +24,11 @@ yarn-error.log*
 
 # local env files — NEVER commit .env.local
 .env*.local
-.env
 .env.local
+.env
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-.vercel
-.env*
