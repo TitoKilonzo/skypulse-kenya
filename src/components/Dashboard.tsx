@@ -391,6 +391,7 @@ export default function Dashboard({
           ) : current ? (
             <>
               <StatCard
+                key="humidity"
                 icon={<Droplets size={15} strokeWidth={1.5} />}
                 label="Humidity"
                 value={`${current.humidity}%`}
@@ -398,6 +399,7 @@ export default function Dashboard({
                 delay="delay-200"
               />
               <StatCard
+                key="wind"
                 icon={<Wind size={15} strokeWidth={1.5} />}
                 label="Wind"
                 value={`${Math.round(current.wind_speed)} m/s`}
@@ -405,6 +407,7 @@ export default function Dashboard({
                 delay="delay-300"
               />
               <StatCard
+                key="visibility"
                 icon={<Eye size={15} strokeWidth={1.5} />}
                 label="Visibility"
                 value={`${((current.visibility ?? 10000) / 1000).toFixed(0)} km`}
@@ -412,6 +415,7 @@ export default function Dashboard({
                 delay="delay-400"
               />
               <StatCard
+                key="uvi"
                 icon={<Thermometer size={15} strokeWidth={1.5} />}
                 label="UV Index"
                 value={String(Math.round(current.uvi))}
@@ -431,6 +435,7 @@ export default function Dashboard({
         {current && !loading && (
           <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard
+              key="pressure"
               icon={<Gauge size={15} strokeWidth={1.5} />}
               label="Pressure"
               value={`${current.pressure}`}
@@ -438,6 +443,7 @@ export default function Dashboard({
               delay="delay-200"
             />
             <StatCard
+              key="rain"
               icon={<CloudRain size={15} strokeWidth={1.5} />}
               label="Rain Chance"
               value={formatPop(hourly[0]?.pop ?? 0)}
@@ -445,6 +451,7 @@ export default function Dashboard({
               delay="delay-300"
             />
             <StatCard
+              key="clouds"
               icon={<Cloudy size={15} strokeWidth={1.5} />}
               label="Cloud Cover"
               value={`${current.clouds}%`}
@@ -452,6 +459,7 @@ export default function Dashboard({
               delay="delay-400"
             />
             <StatCard
+              key="moon"
               icon={<Moon size={15} strokeWidth={1.5} />}
               label="Moon Phase"
               value={moonPhaseLabel(daily[0]?.moon_phase ?? 0).split(" ")[0]}
@@ -588,7 +596,7 @@ export default function Dashboard({
           <section className="animate-fade-up delay-500">
             <div className="glass-card p-5">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
+                <div key="wind-dir">
                   <Waves size={18} className="text-sky-400/50 mx-auto mb-1.5" strokeWidth={1.5} />
                   <p className="text-sky-200 text-sm font-body font-semibold">
                     {windDirection(current.wind_deg)}
@@ -597,7 +605,7 @@ export default function Dashboard({
                     Wind Dir.
                   </p>
                 </div>
-                <div>
+                <div key="uv-risk">
                   <Flame
                     size={18}
                     className={`mx-auto mb-1.5 ${uvInfo(current.uvi).color}`}
@@ -610,7 +618,7 @@ export default function Dashboard({
                     UV Risk
                   </p>
                 </div>
-                <div>
+                <div key="pressure-info">
                   <Activity size={18} className="text-sky-400/50 mx-auto mb-1.5" strokeWidth={1.5} />
                   <p className="text-sky-200 text-sm font-body font-semibold">
                     {current.pressure} hPa
@@ -619,7 +627,7 @@ export default function Dashboard({
                     Pressure
                   </p>
                 </div>
-                <div>
+                <div key="cloud-cover">
                   <Sun size={18} className="text-amber-400/60 mx-auto mb-1.5" strokeWidth={1.5} />
                   <p className="text-sky-200 text-sm font-body font-semibold">
                     {current.clouds}%
