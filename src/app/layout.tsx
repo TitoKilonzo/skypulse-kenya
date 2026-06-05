@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://skypulse.co.ke"),
   title: "SkyPulse Kenya — AI-Powered Weather Dashboard",
   description:
     "Real-time weather forecasts and AI-powered summaries for Kenya and East Africa. Built on the WeatherAI API.",
@@ -19,7 +20,6 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
   manifest: "/site.webmanifest",
-  themeColor: "#0ea5e9",
   openGraph: {
     title: "SkyPulse Kenya",
     description: "Real-time weather + AI insights for Kenya",
@@ -32,6 +32,11 @@ export const metadata: Metadata = {
     description: "Real-time weather + AI insights for Kenya",
     images: ["/og-image.png"],
   },
+};
+
+// themeColor must live in viewport export (Next.js 15+)
+export const viewport: Viewport = {
+  themeColor: "#0ea5e9",
 };
 
 export default function RootLayout({

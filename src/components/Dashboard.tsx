@@ -28,7 +28,7 @@ interface DashboardProps {
   initialError: string | null;
 }
 
-// ─── Weather Icon component (Lucide, no emojis) ───────────────────────────────
+// ─── Weather Icon component ───────────────────────────────────────────────────
 function WeatherIcon({
   icon,
   size = 32,
@@ -53,7 +53,7 @@ function WeatherIcon({
   return <Sun {...props} />;
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
+// ─── Stat Card — Light theme ──────────────────────────────────────────────────
 function StatCard({
   icon,
   label,
@@ -72,15 +72,15 @@ function StatCard({
   return (
     <div
       className={`glass-card p-5 flex flex-col gap-3 animate-fade-up ${delay}
-        ${accent ? "border-sky-400/30" : ""}`}
+        ${accent ? "border-sky-400/40" : ""}`}
     >
       <div className="flex items-center justify-between">
-        <span className="text-sky-400/60 text-xs font-body uppercase tracking-widest">{label}</span>
-        <span className="text-sky-400/40">{icon}</span>
+        <span className="text-sky-600/70 text-xs font-body uppercase tracking-widest">{label}</span>
+        <span className="text-sky-500/60">{icon}</span>
       </div>
-      <p className="font-display text-3xl text-sky-50 leading-none">{value}</p>
+      <p className="font-display text-3xl text-sky-900 leading-none">{value}</p>
       {sub && (
-        <p className="text-sky-300/50 text-xs font-body leading-snug">{sub}</p>
+        <p className="text-sky-600/55 text-xs font-body leading-snug">{sub}</p>
       )}
     </div>
   );
@@ -89,6 +89,12 @@ function StatCard({
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`skeleton ${className}`} />;
+}
+
+// ─── Safe round — avoids NaN children ────────────────────────────────────────
+function safeRound(val: number | undefined | null, fallback = 0): number {
+  const n = Number(val);
+  return isNaN(n) ? fallback : Math.round(n);
 }
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -107,7 +113,7 @@ export default function Dashboard({
   const [showCities, setShowCities] = useState(false);
 
   const icon    = data?.current?.weather?.[0]?.icon ?? "02d";
-  const { url: bgUrl, variant: bgVariant } = getBackgroundImage(icon);
+  const { variant: bgVariant } = getBackgroundImage(icon);
 
   // ── Load by city preset ───────────────────────────────────────────────────
   const loadCity = useCallback(
@@ -151,7 +157,7 @@ export default function Dashboard({
 
   // Auto-detect on mount
   useEffect(() => {
-    if (!initialError) detectLocation();
+    detectLocation(); // always fetch client-side; SSR may fail in some envs
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -162,42 +168,52 @@ export default function Dashboard({
 
   return (
     <div className="relative min-h-dvh">
-      {/* ── Real background image ──────────────────────────────────────── */}
-      <div
-        className={`bg-hero ${bgVariant}`}
-        style={{ backgroundImage: `url('${bgUrl}')` }}
-      />
+      {/* ── Animated sky background ───────────────────────────────────────── */}
+      <div className={`bg-hero ${bgVariant}`}>
+        {/* Drifting cloud blobs */}
+        <div className="cloud-layer">
+          <div key="cloud-1" className="cloud cloud-1" />
+          <div key="cloud-2" className="cloud cloud-2" />
+          <div key="cloud-3" className="cloud cloud-3" />
+          <div key="cloud-4" className="cloud cloud-4" />
+          <div key="cloud-5" className="cloud cloud-5" />
+        </div>
+        {/* Sunbeam rays (hidden on storm/night) */}
+        {bgVariant === "default" && (
+          <div className="absolute inset-0 pointer-events-none z-2">
+            <div key="ray-1" className="sunray sunray-1" />
+            <div key="ray-2" className="sunray sunray-2" />
+            <div key="ray-3" className="sunray sunray-3" />
+            <div key="ray-4" className="sunray sunray-4" />
+            <div key="ray-5" className="sunray sunray-5" />
+          </div>
+        )}
+      </div>
 
-      {/* ── Ambient sky-blue orbs ─────────────────────────────────────── */}
+      {/* ── Ambient orbs ──────────────────────────────────────────────────── */}
       <div
         className="fixed top-[-15%] right-[-5%] w-[700px] h-[700px] rounded-full pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(14,165,233,0.10) 0%, transparent 65%)",
-        }}
+        style={{ background: "radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 65%)" }}
       />
       <div
         className="fixed bottom-[-20%] left-[-8%] w-[500px] h-[500px] rounded-full pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 65%)",
-        }}
+        style={{ background: "radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 65%)" }}
       />
 
-      {/* ── Page content ──────────────────────────────────────────────── */}
+      {/* ── Page content ──────────────────────────────────────────────────── */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-8 space-y-5">
 
-        {/* ── Header ────────────────────────────────────────────────────── */}
+        {/* ── Header ─────────────────────────────────────────────────────── */}
         <header className="flex items-center justify-between animate-fade-up">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl glass-pill flex items-center justify-center glow-sky">
-              <Activity size={16} className="text-sky-400" strokeWidth={2} />
+            <div className="w-9 h-9 rounded-xl glass flex items-center justify-center glow-sky">
+              <Activity size={16} className="text-sky-600" strokeWidth={2} />
             </div>
             <div>
-              <h1 className="font-display text-2xl text-sky-50 leading-none text-glow">
+              <h1 className="font-display text-2xl text-sky-900 leading-none text-glow">
                 SkyPulse
               </h1>
-              <p className="text-[10px] text-sky-400/50 tracking-[0.25em] uppercase font-body mt-0.5">
+              <p className="text-[10px] text-sky-600/55 tracking-[0.25em] uppercase font-body mt-0.5">
                 Kenya Weather
               </p>
             </div>
@@ -207,7 +223,7 @@ export default function Dashboard({
             <button
               onClick={() => setShowCities((v) => !v)}
               className={`glass px-3.5 py-2 text-xs font-body font-medium flex items-center gap-2
-                ${showCities ? "text-sky-300 border-sky-400/40" : "text-sky-300/60 hover:text-sky-300"}`}
+                ${showCities ? "text-sky-700 border-sky-400/50" : "text-sky-600/70 hover:text-sky-700"}`}
             >
               <MapPin size={13} strokeWidth={2} />
               <span className="hidden sm:inline">Cities</span>
@@ -215,8 +231,8 @@ export default function Dashboard({
             <button
               onClick={detectLocation}
               disabled={geoLoading}
-              className="glass px-3.5 py-2 text-xs font-body font-medium text-sky-400 hover:text-sky-300
-                flex items-center gap-2 disabled:opacity-50 hover:border-sky-400/40"
+              className="glass px-3.5 py-2 text-xs font-body font-medium text-sky-600 hover:text-sky-700
+                flex items-center gap-2 disabled:opacity-50 hover:border-sky-400/50"
             >
               {geoLoading ? (
                 <RefreshCw size={13} strokeWidth={2} className="animate-spin" />
@@ -228,21 +244,17 @@ export default function Dashboard({
           </div>
         </header>
 
-        {/* ── City Picker ────────────────────────────────────────────────── */}
+        {/* ── City Picker ─────────────────────────────────────────────────── */}
         {showCities && (
           <div className="glass-card p-5 animate-fade-in">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-sky-200 text-sm font-body font-semibold">
-                  Select a City
-                </p>
-                <p className="text-sky-400/40 text-xs font-body mt-0.5">
-                  Major Kenyan locations
-                </p>
+                <p className="text-sky-800 text-sm font-body font-semibold">Select a City</p>
+                <p className="text-sky-500/60 text-xs font-body mt-0.5">Major Kenyan locations</p>
               </div>
               <button
                 onClick={() => setShowCities(false)}
-                className="text-sky-400/30 hover:text-sky-300 p-1"
+                className="text-sky-400/50 hover:text-sky-600 p-1"
               >
                 <X size={15} strokeWidth={2} />
               </button>
@@ -256,32 +268,30 @@ export default function Dashboard({
                   className={`flex flex-col items-start gap-1 p-3.5 rounded-xl border text-left transition-all
                     ${
                       city === c.name
-                        ? "border-sky-400/50 bg-sky-400/10 text-sky-200"
-                        : "border-sky-400/10 bg-sky-900/20 text-sky-300/50 hover:border-sky-400/30 hover:bg-sky-400/5 hover:text-sky-200"
+                        ? "border-sky-400/60 bg-sky-400/15 text-sky-800"
+                        : "border-sky-200/60 bg-white/40 text-sky-600/60 hover:border-sky-400/40 hover:bg-sky-50/60 hover:text-sky-700"
                     }`}
                 >
-                  <span className="text-[11px] font-body font-semibold tracking-wide">
-                    {c.name}
-                  </span>
-                  <span className="text-[9px] font-body opacity-50">{c.region}</span>
+                  <span className="text-[11px] font-body font-semibold tracking-wide">{c.name}</span>
+                  <span className="text-[9px] font-body opacity-60">{c.region}</span>
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* ── Error Banner ───────────────────────────────────────────────── */}
+        {/* ── Error Banner ────────────────────────────────────────────────── */}
         {error && (
-          <div className="glass-card border-red-400/30 bg-red-400/5 p-4 flex items-start gap-3 animate-fade-in">
-            <AlertTriangle size={16} className="text-red-400 mt-0.5 shrink-0" strokeWidth={2} />
+          <div className="glass-card border-red-300/50 bg-red-50/60 p-4 flex items-start gap-3 animate-fade-in">
+            <AlertTriangle size={16} className="text-red-500 mt-0.5 shrink-0" strokeWidth={2} />
             <div>
-              <p className="text-red-300 text-sm font-body font-medium">Something went wrong</p>
-              <p className="text-red-300/60 text-xs font-body mt-0.5">{error}</p>
+              <p className="text-red-700 text-sm font-body font-medium">Something went wrong</p>
+              <p className="text-red-500/70 text-xs font-body mt-0.5">{error}</p>
             </div>
           </div>
         )}
 
-        {/* ── Hero — Current Conditions ─────────────────────────────────── */}
+        {/* ── Hero — Current Conditions ────────────────────────────────────── */}
         <section className="glass-card p-6 md:p-8 animate-fade-up delay-100">
           {loading ? (
             <div className="space-y-4">
@@ -295,10 +305,10 @@ export default function Dashboard({
               <div>
                 {/* Location */}
                 <div className="flex items-center gap-1.5 mb-5">
-                  <MapPin size={12} className="text-sky-400" strokeWidth={2} />
-                  <span className="text-sky-300 text-sm font-body font-medium">{city}</span>
+                  <MapPin size={12} className="text-sky-500" strokeWidth={2} />
+                  <span className="text-sky-700 text-sm font-body font-medium">{city}</span>
                   {region && (
-                    <span className="text-sky-400/35 text-sm font-body">· {region}</span>
+                    <span className="text-sky-500/50 text-sm font-body">· {region}</span>
                   )}
                 </div>
 
@@ -308,17 +318,17 @@ export default function Dashboard({
                     <WeatherIcon
                       icon={icon}
                       size={56}
-                      className={isNight ? "text-sky-200" : "text-sky-300"}
+                      className={isNight ? "text-sky-600" : "text-amber-500"}
                     />
                   </div>
                   <div>
                     <div className="flex items-start">
-                      <span className="font-display text-8xl md:text-9xl text-sky-50 leading-none text-glow">
-                        {Math.round(current.temp)}
+                      <span className="font-display text-8xl md:text-9xl text-sky-900 leading-none text-glow">
+                        {safeRound(current.temp)}
                       </span>
-                      <span className="font-display text-3xl text-sky-300/70 mt-3">°C</span>
+                      <span className="font-display text-3xl text-sky-600/70 mt-3">°C</span>
                     </div>
-                    <p className="text-sky-300/60 text-sm font-body capitalize mt-1">
+                    <p className="text-sky-600/65 text-sm font-body capitalize mt-1">
                       {current.weather?.[0]?.description ?? ""}
                     </p>
                   </div>
@@ -326,15 +336,15 @@ export default function Dashboard({
 
                 {/* Hi / Lo / Feels */}
                 <div className="flex items-center gap-4 mt-4 text-sm font-body">
-                  <span className="text-sky-400/50">
-                    Feels <span className="text-sky-300/80">{Math.round(current.feels_like)}°</span>
+                  <span className="text-sky-500/60">
+                    Feels <span className="text-sky-700/80">{safeRound(current.feels_like)}°</span>
                   </span>
-                  <span className="w-px h-3.5 bg-sky-400/20" />
-                  <span className="text-sky-400/50">
-                    H <span className="text-sky-300/80">{Math.round(daily[0]?.temp?.max ?? current.temp)}°</span>
+                  <span className="w-px h-3.5 bg-sky-300/40" />
+                  <span className="text-sky-500/60">
+                    H <span className="text-sky-700/80">{safeRound(daily[0]?.temp?.max ?? current.temp)}°</span>
                   </span>
-                  <span className="text-sky-400/50">
-                    L <span className="text-sky-300/80">{Math.round(daily[0]?.temp?.min ?? current.temp)}°</span>
+                  <span className="text-sky-500/60">
+                    L <span className="text-sky-700/80">{safeRound(daily[0]?.temp?.min ?? current.temp)}°</span>
                   </span>
                 </div>
               </div>
@@ -342,41 +352,41 @@ export default function Dashboard({
               {/* Right — sunrise/sunset + time */}
               <div className="flex flex-col gap-4 shrink-0">
                 <div className="glass-pill px-4 py-3 flex items-center gap-2.5">
-                  <Sunrise size={14} className="text-amber-400" strokeWidth={2} />
+                  <Sunrise size={14} className="text-amber-500" strokeWidth={2} />
                   <div>
-                    <p className="text-[9px] text-sky-400/40 font-body uppercase tracking-widest">Sunrise</p>
-                    <p className="text-sky-200 text-sm font-mono">{fmtTime(current.sunrise)}</p>
+                    <p className="text-[9px] text-sky-500/50 font-body uppercase tracking-widest">Sunrise</p>
+                    <p className="text-sky-800 text-sm font-mono">{fmtTime(current.sunrise)}</p>
                   </div>
                 </div>
                 <div className="glass-pill px-4 py-3 flex items-center gap-2.5">
-                  <Sunset size={14} className="text-orange-400" strokeWidth={2} />
+                  <Sunset size={14} className="text-orange-500" strokeWidth={2} />
                   <div>
-                    <p className="text-[9px] text-sky-400/40 font-body uppercase tracking-widest">Sunset</p>
-                    <p className="text-sky-200 text-sm font-mono">{fmtTime(current.sunset)}</p>
+                    <p className="text-[9px] text-sky-500/50 font-body uppercase tracking-widest">Sunset</p>
+                    <p className="text-sky-800 text-sm font-mono">{fmtTime(current.sunset)}</p>
                   </div>
                 </div>
-                <p className="text-sky-400/30 text-[10px] font-mono text-right">
+                <p className="text-sky-400/50 text-[10px] font-mono text-right">
                   EAT · {fmtTime(current.dt)}
                 </p>
               </div>
             </div>
           ) : !error ? (
-            <p className="text-sky-400/30 text-sm font-body">No data available.</p>
+            <p className="text-sky-500/40 text-sm font-body">No data available.</p>
           ) : null}
         </section>
 
-        {/* ── AI Summary ────────────────────────────────────────────────── */}
+        {/* ── AI Summary ──────────────────────────────────────────────────── */}
         {data?.ai_summary && !loading && (
-          <section className="glass-card p-5 border-sky-500/20 animate-fade-up delay-150">
+          <section className="glass-card p-5 border-sky-400/30 animate-fade-up delay-150">
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-lg bg-sky-400/10 border border-sky-400/20 flex items-center justify-center shrink-0 mt-0.5">
-                <Activity size={12} className="text-sky-400" strokeWidth={2} />
+              <div className="w-6 h-6 rounded-lg bg-sky-100/80 border border-sky-300/50 flex items-center justify-center shrink-0 mt-0.5">
+                <Activity size={12} className="text-sky-600" strokeWidth={2} />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-sky-400/60 font-body mb-2">
+                <p className="text-[10px] uppercase tracking-widest text-sky-500/60 font-body mb-2">
                   AI Weather Insight
                 </p>
-                <p className="text-sky-100/75 text-sm font-body leading-relaxed">
+                <p className="text-sky-800/80 text-sm font-body leading-relaxed">
                   {data.ai_summary}
                 </p>
               </div>
@@ -384,7 +394,7 @@ export default function Dashboard({
           </section>
         )}
 
-        {/* ── Stat Cards — Row 1 ────────────────────────────────────────── */}
+        {/* ── Stat Cards — Row 1 ──────────────────────────────────────────── */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28" />)
@@ -395,22 +405,22 @@ export default function Dashboard({
                 icon={<Droplets size={15} strokeWidth={1.5} />}
                 label="Humidity"
                 value={`${current.humidity}%`}
-                sub={`Dew point ${Math.round(current.dew_point ?? 0)}°C`}
+                sub={`Dew point ${safeRound(current.dew_point)}°C`}
                 delay="delay-200"
               />
               <StatCard
                 key="wind"
                 icon={<Wind size={15} strokeWidth={1.5} />}
                 label="Wind"
-                value={`${Math.round(current.wind_speed)} m/s`}
-                sub={`${windDirection(current.wind_deg)}${current.wind_gust ? ` · Gusts ${Math.round(current.wind_gust)} m/s` : ""}`}
+                value={`${safeRound(current.wind_speed)} m/s`}
+                sub={`${windDirection(current.wind_deg)}${current.wind_gust ? ` · Gusts ${safeRound(current.wind_gust)} m/s` : ""}`}
                 delay="delay-300"
               />
               <StatCard
                 key="visibility"
                 icon={<Eye size={15} strokeWidth={1.5} />}
                 label="Visibility"
-                value={`${((current.visibility ?? 10000) / 1000).toFixed(0)} km`}
+                value={`${(((current.visibility ?? 10000) / 1000) || 0).toFixed(0)} km`}
                 sub="Horizontal range"
                 delay="delay-400"
               />
@@ -418,7 +428,7 @@ export default function Dashboard({
                 key="uvi"
                 icon={<Thermometer size={15} strokeWidth={1.5} />}
                 label="UV Index"
-                value={String(Math.round(current.uvi))}
+                value={String(safeRound(current.uvi))}
                 sub={
                   <span className={uvInfo(current.uvi).color}>
                     {uvInfo(current.uvi).label}
@@ -431,7 +441,7 @@ export default function Dashboard({
           ) : null}
         </section>
 
-        {/* ── Stat Cards — Row 2 ────────────────────────────────────────── */}
+        {/* ── Stat Cards — Row 2 ──────────────────────────────────────────── */}
         {current && !loading && (
           <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard
@@ -469,10 +479,10 @@ export default function Dashboard({
           </section>
         )}
 
-        {/* ── 24-Hour Hourly Strip ──────────────────────────────────────── */}
+        {/* ── 24-Hour Hourly Strip ─────────────────────────────────────────── */}
         <section className="animate-fade-up delay-300">
           <div className="flex items-center gap-3 mb-3">
-            <p className="text-[10px] uppercase tracking-widest text-sky-400/40 font-body">
+            <p className="text-[10px] uppercase tracking-widest text-sky-600/50 font-body">
               24-Hour Forecast
             </p>
             <div className="flex-1 divider" />
@@ -486,23 +496,23 @@ export default function Dashboard({
                 <div
                   key={h.dt}
                   className={`glass-card shrink-0 flex flex-col items-center gap-2 px-3.5 py-3.5 min-w-[76px]
-                    ${i === 0 ? "border-sky-400/35 bg-sky-400/8" : ""}`}
+                    ${i === 0 ? "border-sky-400/45 bg-sky-50/60" : ""}`}
                 >
-                  <span className="text-[10px] text-sky-400/50 font-mono">
+                  <span className="text-[10px] text-sky-500/60 font-mono">
                     {i === 0 ? "Now" : fmtTime(h.dt)}
                   </span>
                   <WeatherIcon
                     icon={h.weather?.[0]?.icon ?? "02d"}
                     size={20}
-                    className="text-sky-300"
+                    className="text-sky-600"
                   />
-                  <span className="text-sm font-body font-semibold text-sky-100">
-                    {Math.round(h.temp)}°
+                  <span className="text-sm font-body font-semibold text-sky-900">
+                    {safeRound(h.temp)}°
                   </span>
                   {h.pop > 0.05 && (
                     <div className="flex items-center gap-0.5">
-                      <CloudRain size={9} className="text-sky-400" strokeWidth={2} />
-                      <span className="text-[9px] text-sky-400 font-mono">
+                      <CloudRain size={9} className="text-sky-500" strokeWidth={2} />
+                      <span className="text-[9px] text-sky-500 font-mono">
                         {formatPop(h.pop)}
                       </span>
                     </div>
@@ -513,10 +523,10 @@ export default function Dashboard({
           ) : null}
         </section>
 
-        {/* ── 7-Day Forecast ────────────────────────────────────────────── */}
+        {/* ── 7-Day Forecast ──────────────────────────────────────────────── */}
         <section className="animate-fade-up delay-400">
           <div className="flex items-center gap-3 mb-3">
-            <p className="text-[10px] uppercase tracking-widest text-sky-400/40 font-body">
+            <p className="text-[10px] uppercase tracking-widest text-sky-600/50 font-body">
               7-Day Forecast
             </p>
             <div className="flex-1 divider" />
@@ -529,14 +539,14 @@ export default function Dashboard({
               ))}
             </div>
           ) : daily.length > 0 ? (
-            <div className="glass-card overflow-hidden divide-y divide-sky-400/8">
+            <div className="glass-card overflow-hidden divide-y divide-sky-200/50">
               {daily.slice(0, 7).map((day, i) => (
                 <div
                   key={day.dt}
-                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-sky-400/5 transition-colors group"
+                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-sky-50/50 transition-colors group"
                 >
                   {/* Day label */}
-                  <span className="text-xs text-sky-400/50 font-body w-20 shrink-0">
+                  <span className="text-xs text-sky-600/60 font-body w-20 shrink-0">
                     {i === 0 ? "Today" : fmtDate(day.dt)}
                   </span>
 
@@ -544,19 +554,19 @@ export default function Dashboard({
                   <WeatherIcon
                     icon={day.weather?.[0]?.icon ?? "02d"}
                     size={18}
-                    className="text-sky-300 shrink-0"
+                    className="text-sky-600 shrink-0"
                   />
 
                   {/* Summary */}
-                  <span className="text-sky-300/45 text-xs font-body flex-1 hidden sm:block truncate capitalize">
+                  <span className="text-sky-600/50 text-xs font-body flex-1 hidden sm:block truncate capitalize">
                     {day.summary ?? day.weather?.[0]?.description ?? ""}
                   </span>
 
                   {/* Rain chance */}
                   {day.pop > 0.05 && (
                     <div className="flex items-center gap-1 shrink-0">
-                      <CloudRain size={11} className="text-sky-400/60" strokeWidth={2} />
-                      <span className="text-[11px] text-sky-400/70 font-mono">
+                      <CloudRain size={11} className="text-sky-500/70" strokeWidth={2} />
+                      <span className="text-[11px] text-sky-500/80 font-mono">
                         {formatPop(day.pop)}
                       </span>
                     </div>
@@ -564,25 +574,25 @@ export default function Dashboard({
 
                   {/* Temp range */}
                   <div className="flex items-center gap-2.5 shrink-0 ml-2">
-                    <span className="text-sky-400/40 text-xs font-mono w-8 text-right">
-                      {Math.round(day.temp?.min ?? 0)}°
+                    <span className="text-sky-500/50 text-xs font-mono w-8 text-right">
+                      {safeRound(day.temp?.min)}°
                     </span>
-                    <div className="w-16 h-1 rounded-full bg-sky-900/60 hidden sm:block overflow-hidden">
+                    <div className="w-16 h-1 rounded-full bg-sky-100/80 hidden sm:block overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-sky-500 to-sky-300"
+                        className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-300"
                         style={{
                           width: `${Math.min(100, Math.max(20, (((day.temp?.max ?? 0) - (day.temp?.min ?? 0)) / 15) * 100))}%`,
                         }}
                       />
                     </div>
-                    <span className="text-sky-200 text-xs font-mono font-medium w-8">
-                      {Math.round(day.temp?.max ?? 0)}°
+                    <span className="text-sky-800 text-xs font-mono font-medium w-8">
+                      {safeRound(day.temp?.max)}°
                     </span>
                   </div>
 
                   <ChevronRight
                     size={13}
-                    className="text-sky-400/20 shrink-0 group-hover:text-sky-400/50 transition-colors"
+                    className="text-sky-300/50 shrink-0 group-hover:text-sky-500/70 transition-colors"
                     strokeWidth={2}
                   />
                 </div>
@@ -591,17 +601,17 @@ export default function Dashboard({
           ) : null}
         </section>
 
-        {/* ── Quick Info Strip ──────────────────────────────────────────── */}
+        {/* ── Quick Info Strip ─────────────────────────────────────────────── */}
         {current && !loading && (
           <section className="animate-fade-up delay-500">
             <div className="glass-card p-5">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div key="wind-dir">
-                  <Waves size={18} className="text-sky-400/50 mx-auto mb-1.5" strokeWidth={1.5} />
-                  <p className="text-sky-200 text-sm font-body font-semibold">
+                  <Waves size={18} className="text-sky-500/60 mx-auto mb-1.5" strokeWidth={1.5} />
+                  <p className="text-sky-800 text-sm font-body font-semibold">
                     {windDirection(current.wind_deg)}
                   </p>
-                  <p className="text-sky-400/40 text-[10px] font-body uppercase tracking-widest mt-0.5">
+                  <p className="text-sky-500/50 text-[10px] font-body uppercase tracking-widest mt-0.5">
                     Wind Dir.
                   </p>
                 </div>
@@ -614,25 +624,25 @@ export default function Dashboard({
                   <p className={`text-sm font-body font-semibold ${uvInfo(current.uvi).color}`}>
                     {uvInfo(current.uvi).label}
                   </p>
-                  <p className="text-sky-400/40 text-[10px] font-body uppercase tracking-widest mt-0.5">
+                  <p className="text-sky-500/50 text-[10px] font-body uppercase tracking-widest mt-0.5">
                     UV Risk
                   </p>
                 </div>
                 <div key="pressure-info">
-                  <Activity size={18} className="text-sky-400/50 mx-auto mb-1.5" strokeWidth={1.5} />
-                  <p className="text-sky-200 text-sm font-body font-semibold">
+                  <Activity size={18} className="text-sky-500/60 mx-auto mb-1.5" strokeWidth={1.5} />
+                  <p className="text-sky-800 text-sm font-body font-semibold">
                     {current.pressure} hPa
                   </p>
-                  <p className="text-sky-400/40 text-[10px] font-body uppercase tracking-widest mt-0.5">
+                  <p className="text-sky-500/50 text-[10px] font-body uppercase tracking-widest mt-0.5">
                     Pressure
                   </p>
                 </div>
                 <div key="cloud-cover">
-                  <Sun size={18} className="text-amber-400/60 mx-auto mb-1.5" strokeWidth={1.5} />
-                  <p className="text-sky-200 text-sm font-body font-semibold">
+                  <Sun size={18} className="text-amber-500/70 mx-auto mb-1.5" strokeWidth={1.5} />
+                  <p className="text-sky-800 text-sm font-body font-semibold">
                     {current.clouds}%
                   </p>
-                  <p className="text-sky-400/40 text-[10px] font-body uppercase tracking-widest mt-0.5">
+                  <p className="text-sky-500/50 text-[10px] font-body uppercase tracking-widest mt-0.5">
                     Cloud Cover
                   </p>
                 </div>
@@ -641,15 +651,15 @@ export default function Dashboard({
           </section>
         )}
 
-        {/* ── Footer ────────────────────────────────────────────────────── */}
-        <footer className="flex items-center justify-between text-[10px] text-sky-400/25 pb-4 pt-2 font-body animate-fade-up delay-600">
+        {/* ── Footer ───────────────────────────────────────────────────────── */}
+        <footer className="flex items-center justify-between text-[10px] text-sky-500/40 pb-4 pt-2 font-body animate-fade-up delay-600">
           <span>
             Powered by{" "}
             <a
               href="https://weather-ai.co"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sky-400/50 hover:text-sky-400 transition-colors"
+              className="text-sky-500/60 hover:text-sky-600 transition-colors"
             >
               WeatherAI API
             </a>
