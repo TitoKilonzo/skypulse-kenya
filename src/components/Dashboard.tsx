@@ -319,7 +319,7 @@ export default function Dashboard({
                       <span className="font-display text-3xl text-sky-300/70 mt-3">°C</span>
                     </div>
                     <p className="text-sky-300/60 text-sm font-body capitalize mt-1">
-                      {current.weather[0].description}
+                      {current.weather?.[0]?.description ?? ""}
                     </p>
                   </div>
                 </div>
@@ -484,7 +484,7 @@ export default function Dashboard({
                     {i === 0 ? "Now" : fmtTime(h.dt)}
                   </span>
                   <WeatherIcon
-                    icon={h.weather[0].icon}
+                    icon={h.weather?.[0]?.icon ?? "02d"}
                     size={20}
                     className="text-sky-300"
                   />
@@ -534,14 +534,14 @@ export default function Dashboard({
 
                   {/* Weather icon */}
                   <WeatherIcon
-                    icon={day.weather[0].icon}
+                    icon={day.weather?.[0]?.icon ?? "02d"}
                     size={18}
                     className="text-sky-300 shrink-0"
                   />
 
                   {/* Summary */}
                   <span className="text-sky-300/45 text-xs font-body flex-1 hidden sm:block truncate capitalize">
-                    {day.summary ?? day.weather[0].description}
+                    {day.summary ?? day.weather?.[0]?.description ?? ""}
                   </span>
 
                   {/* Rain chance */}
@@ -557,18 +557,18 @@ export default function Dashboard({
                   {/* Temp range */}
                   <div className="flex items-center gap-2.5 shrink-0 ml-2">
                     <span className="text-sky-400/40 text-xs font-mono w-8 text-right">
-                      {Math.round(day.temp.min)}°
+                      {Math.round(day.temp?.min ?? 0)}°
                     </span>
                     <div className="w-16 h-1 rounded-full bg-sky-900/60 hidden sm:block overflow-hidden">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-sky-500 to-sky-300"
                         style={{
-                          width: `${Math.min(100, Math.max(20, ((day.temp.max - day.temp.min) / 15) * 100))}%`,
+                          width: `${Math.min(100, Math.max(20, (((day.temp?.max ?? 0) - (day.temp?.min ?? 0)) / 15) * 100))}%`,
                         }}
                       />
                     </div>
                     <span className="text-sky-200 text-xs font-mono font-medium w-8">
-                      {Math.round(day.temp.max)}°
+                      {Math.round(day.temp?.max ?? 0)}°
                     </span>
                   </div>
 
